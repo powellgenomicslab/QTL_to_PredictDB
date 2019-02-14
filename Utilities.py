@@ -26,11 +26,10 @@ COLUMN_SE="column_se"
 
 
 def add_column_arguments_to_parser(parser):
-    parser.add_argument("--gtex_format", help="Boolean indicating whether SNP column has the format chr_pos_ref_alt_genomebuild", action="store_true", default=False)
-    parser.add_argument("--snp_annotation", help="Path to file containing a list of the variants to be included and their annotations.")
-    parser.add_argument("--ignore_if_not_in_dictionary", help="If true (default), discard SNP when it's not in the SNP dictionary provided.", default=True)
     parser.add_argument("--ignore_indels", help="If true (default), insertions and deletions are discarded.", default=True)
     parser.add_argument("--snp_column", help="Name of -snp column- in eQTL input file", default="SNP")
+    parser.add_argument("--snpid_format", help=""" Either "rsid" or a Python regular expression containing groups named "chromosome", \
+                                                   "position" and possibly "effect_allele" and "non_effect_allele". """, default="rsid")
     parser.add_argument("--ref_allele_column", help="Name of -reference allele column- in eQTL input file", default=None)
     parser.add_argument("--alt_allele_column", help="Name of -alternative, or dosage, allele column- in eQTL input file", default=None)
     parser.add_argument("--gene_column", help="Name of -gene column- in eQTL input file", default=None)
@@ -40,6 +39,11 @@ def add_column_arguments_to_parser(parser):
     parser.add_argument("--beta_column", help="Name of snp association's -beta column- in eQTL input file", default=None)
     parser.add_argument("--se_column", help="Name of snp association's -beta standard error- column in eQTL input file", default=None)
     parser.add_argument("--pvalue_column", help="Name of snp association's -pvalue column- in eQTL input file", default=None)
+    parser.add_argument("--snp_annot_file", help="Path to file containing chromosome, position and snp ID.")
+    parser.add_argument("--snp_annot_snpid_column", help="Name of -snp id column- in SNP annotation file", default=None)
+    parser.add_argument("--snp_annot_chr_column", help="Name of -chromosome column- in SNP annotation file", default=None)
+    parser.add_argument("--snp_annot_position_column", help="Name of -base position column- in SNP annotation file", default=None)
+    parser.add_argument("--ignore_if_not_in_snp_annot", help="If true (default), discard SNP when it's not in the SNP dictionary provided.", default=True)
 
 
 #def format_dict_from_params(dict, parameters):
@@ -105,14 +109,13 @@ def validate_input_parameters(params, info_from_snpid):
         #if not _f_ref_allele_column(format): raise Exceptions.InvalidArguments("Need to provide a -reference allele- column")
         #if not _f_alt_allele_column(format): raise Exceptions.InvalidArguments("Need to provide an -alternative (or dosage) allele- column")
     #if not _f_snp(format): raise Exceptions.InvalidArguments("Need to provide a SNP column")
-    #if not _f_snp(format): raise Exceptions.InvalidArguments("Need to provide a SNP column")
     #if not _f_pvalue_column(format): raise Exceptions.InvalidArguments("Need to provide a -p-value- column")
     #if not _f_beta_column(format): raise Exceptions.InvalidArguments("Need to provide a -beta- column")
 
 
 def write_row_into_db(row, db):
-    db("INSERT INTO weights VALUES(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", NULL, NULL)" % \
-        (row[SNP], row[GENENAME], row[BETA], row[VAR_ID], row[REF_ALLELE], row[ALT_ALLELE], row[PVALUE], row[CHROMOSOME], row[POSITION]))
+    db("INSERT INTO weights VALUES(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", NULL, NULL)" % \
+        (row[SNP], row[GENENAME], row[BETA], row[VAR_ID], row[REF_ALLELE], row[ALT_ALLELE], row[PVALUE]))
 
 
 def write_df_into_db(df, db):
