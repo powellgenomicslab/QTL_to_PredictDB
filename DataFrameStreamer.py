@@ -65,50 +65,39 @@ def to_dataframe(data, columns, to_numeric=None, fill_na=None):
     return data
 
 
-def get_chr_pos_from_snpid(snpid, sep = "_"):
-    chromosome, position = snpid.split(sep)
+def extract_chr_pos(snpid, regex):
+    chromosome, position = snpid.group("chromosome", "position")
     return {Constants.CHROMOSOME: chromosome, Constants.POSITION: position}
+
+
+def extract_chr_pos_ea_nea(snpid, regex):
+    match = regex.match(snpid)
+    chromosome, position, effect_allele, non_effect_allele = \
+           match.group("chromosome", "position", "effect_allele", "non_effect_allele")
+    return {Constants.CHROMOSOME: chromosome, Constants.POSITION: position, \
+            Constants.REF_ALLELE: non_effect_allele, Constants.ALT_ALLELE: effect_allele}
 
 
 def get_rsid(snpid):
     return {Constants.SNP: snpid}
 
 
-def get_info_from_var_id(varID):
-    chr, pos, ref_allele, alt_allele, build_version = varID.split("_")
-    return {Constants.CHROMOSOME: chr, Constants.POSITION: pos, \
-            Constants.REF_ALLELE: ref_allele, Constants.ALT_ALLELE: alt_allele}
-
-
-def build_var_id(chromosome, position, ref_allele, alt_allele):
-    return "_".join([str(chromosome), str(position), ref_allele, alt_allele, "b37"])
-
-
-def build_dictionary(filepath, rsid_as_key = False):
-
-    def chr_from_snps_file(comps):           chr = comps[0]; return chr
-    def pos_from_snps_file(comps):           pos = comps[1]; return pos
-    def ref_allele_from_snps_file(comps):    ref = comps[3]; return ref
-    def alt_allele_from_snps_file(comps):    alt = comps[4]; return alt
-    def rsid_from_snps_file(comps):         rsid = comps[7]; return rsid
-    def generate_key(chr, pos):                    return (chr, pos)
-
-    dictionary = {}
+def build_snp_dictionary(filepath, args, rsid_as_key = False):
 
     import os
-    print os.getcwd()
-    print filepath
-
     _open = gzip.open if filepath.endswith(".gz") else open
     with _open(filepath) as d:
-        print "Loading HapMap CEU SNP list from %s..." % filepath
+        dictionary = {}
         for i, line in enumerate(d):
-            if i == 0:
-                continue
             comps = line.strip().split()
-            chromosome = chr_from_snps_file(comps)
-            position = pos_from_snps_file(comps)
-            rsid = rsid_from_snps_file(comps)
+            if i == 0:
+                snpid_idx = comps.index(args.snp_annot_snpid_column)
+                chr_idx = comps.index(args.snp_annot_chr_column)
+                pos_idx = comps.index(args.snp_annot_position_column)
+                continue
+            chromosome = comps[chr_idx]
+            position = comps[pos_idx]
+            rsid = comps[snpid_idx]
             if rsid_as_key:
                 dictionary[rsid] = (chromosome, position)
             else:
@@ -116,20 +105,16 @@ def build_dictionary(filepath, rsid_as_key = False):
     return dictionary
 
 
-def decide_snpid_parsing_function(snpid):
+def decide_snpid_parser(snpid_format):
 
-    if re.compile("^rs[0-9]+$").match(snpid):
+    print(snpid_format)
+    if snpid_format == "rsid":
         return 1, get_rsid
-    elif re.compile("^[0-9]{1,2}_[0-9]+$").match(snpid):
-        def with_underscore(snpid):
-            return get_chr_pos_from_snpid(snpid, sep = "_")
-        return 2, with_underscore
-    elif re.compile("^[0-9]{1,2}:[0-9]+$").match(snpid):
-        def with_colon(snpid):
-            return get_chr_pos_from_snpid(snpid, sep = ":")
-        return 2, with_colon
-    elif re.compile("^[0-9]{1,2}_[0-9]+_[ACGTacgt]+_[ACGTacgt]+").match(snpid):
-        return 3, get_info_from_var_id
+    elif "(?P<chromosome>.*)" in snpid_format and "(?P<position>.*)" in snpid_format:
+        if "(?P<effect_allele>.*)" in snpid_format and "(?P<non_effect_allele>.*)" in snpid_format:
+            return 3, extract_chr_pos_ea_nea
+        else:
+            return 2, extract_chr_and_pos
     else:
         exit("SNP ID format not supported.")
 
@@ -142,7 +127,7 @@ def total_n_of_snps_in_eQTL(filename):
         return None
     else:
         with open(filename) as eqtl:
-            eqtl.readline() # skip header  #TODO: consider headers with several lines
+            eqtl.readline() # skip header #TODO: consider headers with several lines
             first_line = eqtl.readline()
             filesize = os.path.getsize(filename)
             est_n_lines = filesize / len(first_line)
@@ -176,13 +161,13 @@ def get_df_colnames():
 
 # get the relevant information from the rows of a eQTL file from the GTEx consortium
 # the SNP ID for these files is chr_pos_alt_ref_build, e.g. 1_123456789_A_G_b37
-# ignore_if_not_in_dictionary == True: ignore rows with SNPs absent from dictionary***
+# ignore_if_not_in_snp_annot == True: ignore rows with SNPs absent from dictionary***
 def process_row(comps, pval_thr, indexes, \
                 snp_dictionary, \
-                parse_snpid, \
+                snpid_parser, \
                 info_from_snp_id, \
-                ignore_if_not_in_dictionary = True, \
-                ignore_indels = True):
+                ignore_if_not_in_snp_annot = True, \
+                ignore_indels = True, snpid_regex=None):
 
     pvalue = comps[indexes[Constants.PVALUE]]
 
@@ -193,41 +178,39 @@ def process_row(comps, pval_thr, indexes, \
 
     # extract info from snp ID.
     if info_from_snp_id == 1: # rsid
-        info_from_snp = parse_snpid(snp_id)
+        info_from_snp = snpid_parser(snp_id)
         snp_id = info_from_snp[Constants.SNP]
-        if snp_id not in snp_dictionary:
-            if ignore_if_not_in_dictionary:
-                return None
+        if snp_id not in snp_dictionary and ignore_if_not_in_snp_annot:
+            return None
         ref_allele = comps[indexes[Constants.REF_ALLELE]]
         alt_allele = comps[indexes[Constants.ALT_ALLELE]]
         var_id = snp_id
         chromosome, position = snp_dictionary[var_id]
 
     elif info_from_snp_id == 2: # chr, pos
-        info_from_snp = parse_snpid(snp_id)
+        info_from_snp = snpid_parser(snp_id, snpid_regex)
         chromosome, position = info_from_snp[Constants.CHROMOSOME], info_from_snp[Constants.POSITION]
         ref_allele = comps[indexes[Constants.REF_ALLELE]]
         alt_allele = comps[indexes[Constants.ALT_ALLELE]]
         key = (chromosome, position)
-        if key not in snp_dictionary:
-            if ignore_if_not_in_dictionary:
-                return None
-        else:
-            snp_id = snp_dictionary[key]
-        var_id = build_var_id(chromosome, position, ref_allele, alt_allele)
+        if key not in snp_dictionary and ignore_if_not_in_snp_annot:
+            return None
+        var_id = snp_dictionary[key]
 
     elif info_from_snp_id == 3: # chr, pos, ref, alt
-        info_from_snp = parse_snpid(snp_id)
+        info_from_snp = snpid_parser(snp_id, snpid_regex)
         chromosome, position, ref_allele, alt_allele = \
-            info_from_snp[Constants.CHROMOSOME], info_from_snp[Constants.POSITION], info_from_snp[Constants.REF_ALLELE], info_from_snp[Constants.ALT_ALLELE]
+            info_from_snp[Constants.CHROMOSOME], \
+            info_from_snp[Constants.POSITION], \
+            info_from_snp[Constants.REF_ALLELE], \
+            info_from_snp[Constants.ALT_ALLELE]
+
         key = (chromosome, position)
-        if key not in snp_dictionary and ignore_if_not_in_dictionary:
+        if key not in snp_dictionary and ignore_if_not_in_snp_annot:
             #print "%s is not in dictionary" % (key,)
             return None
-        else:
-            #print "%s is in dictionary" % (key,)
-            snp_id = snp_dictionary[key]
-            var_id = build_var_id(chromosome, position, ref_allele, alt_allele)
+        snp_id = snp_dictionary[key]
+        var_id = snp_id
 
     # if we are ignoring indels and the variant happens to be one...
     if ignore_indels and (ref_allele not in Constants.alleles or alt_allele not in Constants.alleles):
@@ -237,7 +220,7 @@ def process_row(comps, pval_thr, indexes, \
     beta = comps[indexes[Constants.BETA]]
 
     row = [chromosome, position, ref_allele, alt_allele, var_id, \
-             snp_id, genename, beta, pvalue ]
+             snp_id, genename, beta, pvalue]
 
     return row
 
@@ -249,8 +232,8 @@ def include_gene_(gene, white_list, black_list):
     return include_gene
 
 
-# FIXME: this function is too long
-def read_eQTL_file(params):
+# FIXME: function is too long
+def read_eQTL_file(eqtl_file, params, snpid_regex=None):
 
     found = set()
     gene_column = params.gene_column  # sentinel_column
@@ -261,15 +244,16 @@ def read_eQTL_file(params):
     else:
         params.pval_threshold = float(params.pval_threshold)
 
-    # estimate number of SNPs in QTL file, to display progress of model generation
-    total_snps = total_n_of_snps_in_eQTL(params.input_file)
+    # estimate number of SNPs in QTL file, in order to display progress of model generation
+    total_snps = total_n_of_snps_in_eQTL(eqtl_file)
 
     total_for_gene = 0
     passed_for_gene = 0
+    number_of_genes_passed = 0
 
-    _open = gzip.open if ".gz" in params.input_file else open
-    with _open(params.input_file) as ifile:
+    _open = gzip.open if eqtl_file.endswith("gz") else open
 
+    with _open(eqtl_file) as ifile:
         sentinel = None
         buf = []
         progress = 0
@@ -285,21 +269,17 @@ def read_eQTL_file(params):
                 gene_index = indexes[Constants.GENENAME]
                 continue
 
-            # FIRST LINE OF DATA
-            # FIXME: put this into a separate function
-            if i == 1:
+            # Decide how to treat SNP ID (it depends on the info it contains)                        
+            if i == 1: # FIRST LINE OF DATA
                 snpid = comps[indexes[Constants.SNP]]
-                snpid_type, parse_snpid = decide_snpid_parsing_function(snpid)
+                snpid_type, snpid_parser = decide_snpid_parser(params.snpid_format)
                 if snpid_type == 1:
-                    snp_dictionary = build_dictionary(params.snp_dictionary, rsid_as_key = True)
-                elif snpid_type == 2:
-                    snp_dictionary = build_dictionary(params.snp_dictionary, rsid_as_key = False)
-                elif snpid_type == 3:
-                    snp_dictionary = build_dictionary(params.snp_dictionary, rsid_as_key = False)
+                    snp_dictionary = build_snp_dictionary(params.snp_annot_file, params, rsid_as_key=True)
+                elif snpid_type in (2,3):
+                    snp_dictionary = build_snp_dictionary(params.snp_annot_file, params, rsid_as_key=False)
                 Utilities.validate_input_parameters(params, snpid_type)
 
             progress = show_progress(progress, i, total_snps)
-
             row_sentinel = comps[gene_index]
 
             if sentinel is None:
@@ -311,9 +291,9 @@ def read_eQTL_file(params):
                 if include_gene:
                     total_for_gene += 1
                     new_row = process_row(comps, params.pval_threshold, indexes, \
-                                          snp_dictionary, parse_snpid, \
-                                          snpid_type, params.ignore_if_not_in_dictionary, \
-                                          params.ignore_indels)
+                                          snp_dictionary, snpid_parser, \
+                                          snpid_type, params.ignore_if_not_in_snp_annot, \
+                                          params.ignore_indels, snpid_regex)
 
                     if new_row is not None:
                         passed_for_gene += 1
@@ -323,7 +303,7 @@ def read_eQTL_file(params):
             else: # if the gene just changed, we have to decide whether we have to include it or not
                 include_gene = include_gene_(sentinel, params.gene_white_list, params.gene_black_list)
                 if include_gene:
-                    number_of_genes_passed += 1
+                    passed_for_gene += 1
 
             # if we're here, this is the last line for the current gene (because the gene just changed),
             # therefore we write the data into a pandas dataframe
@@ -331,8 +311,8 @@ def read_eQTL_file(params):
             data = to_dataframe(buf, get_df_colnames(), to_numeric="ignore")
             yield data
 
-            total_for_gene = 0
             passed_for_gene = 0
+            total_for_gene = 0
 
             if params.gene_white_list is not None:
                 found.add(sentinel)
@@ -341,14 +321,14 @@ def read_eQTL_file(params):
                     return
 
             new_row = process_row(comps, params.pval_threshold, indexes, \
-                                  snp_dictionary, parse_snpid, \
-                                  snpid_type, params.ignore_if_not_in_dictionary, \
-                                  params.ignore_indels)
+                                  snp_dictionary, snpid_parser, \
+                                  snpid_type, params.ignore_if_not_in_snp_annot, \
+                                  params.ignore_indels, snpid_regex)
 
             buf = [new_row] if new_row else []
             sentinel = comps[gene_index]
 
-        # If we reach the end of the file and buf still contains something...
+        # If we reached the end of the file and buf still contains something...
         if len(buf):
             data = to_dataframe(buf, get_df_colnames(), to_numeric="ignore")
             yield data

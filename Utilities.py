@@ -27,7 +27,7 @@ COLUMN_SE="column_se"
 
 def add_column_arguments_to_parser(parser):
     parser.add_argument("--gtex_format", help="Boolean indicating whether SNP column has the format chr_pos_ref_alt_genomebuild", action="store_true", default=False)
-    parser.add_argument("--snp_dictionary", help="Path to file containing chr:position in the first column, and rsID in the second.")
+    parser.add_argument("--snp_annotation", help="Path to file containing a list of the variants to be included and their annotations.")
     parser.add_argument("--ignore_if_not_in_dictionary", help="If true (default), discard SNP when it's not in the SNP dictionary provided.", default=True)
     parser.add_argument("--ignore_indels", help="If true (default), insertions and deletions are discarded.", default=True)
     parser.add_argument("--snp_column", help="Name of -snp column- in eQTL input file", default="SNP")
@@ -111,8 +111,8 @@ def validate_input_parameters(params, info_from_snpid):
 
 
 def write_row_into_db(row, db):
-    db("INSERT INTO weights VALUES(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", NULL, NULL)" % \
-        (row[SNP], row[GENENAME], row[BETA], row[VAR_ID], row[REF_ALLELE], row[ALT_ALLELE], row[PVALUE]))
+    db("INSERT INTO weights VALUES(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", NULL, NULL)" % \
+        (row[SNP], row[GENENAME], row[BETA], row[VAR_ID], row[REF_ALLELE], row[ALT_ALLELE], row[PVALUE], row[CHROMOSOME], row[POSITION]))
 
 
 def write_df_into_db(df, db):

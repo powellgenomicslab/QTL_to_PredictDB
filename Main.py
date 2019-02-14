@@ -4,10 +4,10 @@
   This tool allows to convert the result of multiple genome-wide univariate regressions
   on a molecular trait (QTLs) [typically gene expression (eQTL), splicing (sQTL),
   protein levels (pQTL)] to a SQLite database containing prediction weights, suitable
-  for use with the PrediXcan/S-PrediXcan pipeline.
+  for use with the PrediXcan/S-PrediXcan tools.
 
-  It also produces a genotype covariance matrix associated to that model, which is
-  a necessary input for S-PrediXcan.
+  To be implemented: produce a genotype covariance matrix associated to that model, a 
+  necessary input for S-PrediXcan.
 '''
 
 __author__ = 'rbonazzola'
@@ -21,13 +21,11 @@ import Utilities
 import Methods
 import logging
 import Constants
+import pandas
+import re
 
 DEBUG = False
 N_OF_GENES = 200
-
-
-import pandas
-print pandas.__version__
 
 ########################################################################################################################
 #                                                |--------------------|                                                #
@@ -35,12 +33,8 @@ print pandas.__version__
 #                                                |--------------------|                                                #
 ########################################################################################################################
 
-def run(args, batch = False, ask_user = False, remove_existent_db=True):
 
-    start = time.time()
-
-    print args.input_file
-
+def check_if_dbfile_exists(args, batch, ask_user, remove_existent_db):
     # Ask the user how to proceed in the presence of a previously existent homonym DB.
     if os.path.exists(args.output_file):
         if not remove_existent_db:
@@ -60,6 +54,11 @@ def run(args, batch = False, ask_user = False, remove_existent_db=True):
            print "Removing old %s file" % os.path.basename(args.output_file)
            os.remove(args.output_file)
 
+
+def build_white_and_black_gene_lists(args):
+    
+    gene_white_list, gene_black_list = (None, None)
+
     if args.gene_white_list is not None:
         # FIXME: maybe I should remove the restriction that the file has a "txt" extension
         if args.gene_white_list.endswith(".txt") and args.gene_white_list in os.listdir("."):
@@ -67,8 +66,6 @@ def run(args, batch = False, ask_user = False, remove_existent_db=True):
             with open(args.gene_white_list) as gene_wl:
                 for line in gene_wl:
                     gene_white_list.extend([gene for gene in line.strip().split()])
-                args.gene_white_list = gene_white_list
-        print args.gene_white_list
 
     if args.gene_black_list is not None:
         if args.gene_white_list is not None:
@@ -79,25 +76,50 @@ def run(args, batch = False, ask_user = False, remove_existent_db=True):
             with open(args.gene_black_list) as gene_bl:
                 for line in gene_bl:
                     gene_black_list.extend([gene for gene in line.strip().split()])
-                args.gene_black_list = gene_black_list
 
+    return gene_white_list, gene_black_list
+
+
+
+def run(args, batch = False, ask_user = False, remove_existent_db=True):
+
+    start = time.time()
+   
+    check_if_dbfile_exists(args, batch, ask_user, remove_existent_db)
+    
+    gene_white_list, gene_black_list = build_white_and_black_gene_lists(args)
 
     db = SQLiteDB.DB(args.output_file)
 
-    genes_total = 0
-    genes_passed = 0
+    genes_total = 0; genes_passed = 0
 
-    # Read input file: each chunk corresponds to all SNPs associated to the expression of a given gene
-    for i, chunk in enumerate(DFS.read_eQTL_file(args)):
-        chunk = Methods.generate_weights(chunk, args)
-        if len(chunk.index) != 0:
-            genes_passed += 1
-            gene_name = chunk.iloc[0][Constants.GENENAME]
-            db("INSERT INTO extra VALUES(\"%s\", \"%s\",  NULL, NULL, NULL)" % (gene_name, gene_name))
-        Utilities.write_df_into_db(chunk, db)
-        genes_total = i + 1
-        if DEBUG and i == N_OF_GENES:
-            break
+    # files to iterate over
+    if args.input_file:
+        eqtl_files = [args.input_file]
+    elif args.input_folder:
+        eqtl_files = [os.path.join(args.input_folder, x) for x in os.listdir(args.input_folder)]
+    else:
+        logging.error("You must provide exactly one of the followings arguments: --input_folder or --input_file.")
+        exit("Aborting...")
+
+    if args.snpid_format != "rsid":
+       snpid_regex = re.compile(args.snpid_format)
+    else:
+       snpid_regex = None
+
+    # Each chunk corresponds to all SNPs associated to the expression of a given gene
+    for eqtl_file in eqtl_files:
+        logging.info("Processing %s" % eqtl_file)
+        for i, chunk in enumerate(DFS.read_eQTL_file(eqtl_file, args, snpid_regex)):
+            chunk = Methods.generate_weights(chunk, args) # convert to a Pandas data frame
+            if len(chunk.index) != 0:
+                genes_passed += 1
+                gene_name = chunk.iloc[0][Constants.GENENAME] # extract gene name
+                db("INSERT INTO extra VALUES(\"%s\", \"%s\",  NULL, NULL, NULL)" % (gene_name, gene_name))
+            Utilities.write_df_into_db(chunk, db)
+            genes_total = i + 1
+            if DEBUG and i == N_OF_GENES:
+                break
 
     print "DB %s created, with %d/%d genes." % (args.output_file, genes_passed, genes_total)
     print "--- %s seconds ---" % (time.time() - start)
@@ -115,7 +137,8 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Create a PrediXcan-compatible SQLite database with gene expression prediction weights computed from eQTL input files.')
 
-    parser.add_argument("--input_file", required=True, help="Input eQTL file path.")
+    parser.add_argument("--input_file", help="Path to input eQTL file.")
+    parser.add_argument("--input_folder", help="Folder containing eQTL files.")
 
     # add to parses arguments concerning file column names
     Utilities.add_column_arguments_to_parser(parser)

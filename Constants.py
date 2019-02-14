@@ -23,14 +23,14 @@ PVALUE_idx = 6
 BETA_idx = 7
 SE_idx = 8
 
+CHROMOSOME_IDX_FROM_SNP_ANNOTATION = 0
+POSITION_IDX_FROM_SNP_ANNOTATION = 1
+REF_ALLELE_IDX_FROM_SNP_ANNOTATION = 3
+ALT_ALLELE_IDX_FROM_SNP_ANNOTATION = 4
+RSID_IDX_FROM_SNP_ANNOTATION = 6
+
 alleles = ["A", "C", "T", "G", "a", "c", "t", "g"]
 
 SNPID_1 = [SNP]
 SNPID_2 = [CHROMOSOME, POSITION]
 SNPID_3 = [CHROMOSOME, POSITION, REF_ALLELE, ALT_ALLELE]
-
-# number of lines in eQTL files (to display degree of completion)
-number_of_lines = {
-    "Whole_Blood.allpairs.txt.gz": 144733342,
-    "Cells_EBV-transformed_lymphocytes.allpairs.txt.gz": 159717963
-}

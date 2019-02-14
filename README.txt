@@ -1,0 +1,1 @@
+Code for generating prediction models for molecular traits (gene expression, methylation rate, intron excision, etc.) as SQLite databases, in the format required by both PrediXcan and S-PrediXcan, starting from the corresponding QTL summary statistics.

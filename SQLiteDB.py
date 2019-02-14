@@ -26,8 +26,12 @@ class DB:
         ''' Opens connection to database '''
         self.connection = sqlite3.connect(db_file)
         self.c = self.connection.cursor()
-        self("CREATE TABLE weights (rsid TEXT, gene TEXT, weight DOUBLE, varID TEXT, ref_allele CHARACTER, eff_allele CHARACTER, pval DOUBLE, N INTEGER, cis INTEGER)")
-        self("CREATE TABLE extra (gene TEXT, genename TEXT, [pred.perf.R2] DOUBLE, [pred.perf.pval] DOUBLE, [pred.perf.qval] DOUBLE)")
+        self("CREATE TABLE weights (rsid TEXT, gene TEXT, weight DOUBLE, varID TEXT, \
+                                    ref_allele CHARACTER, eff_allele CHARACTER, pval DOUBLE, \
+                                    chromosome INTEGER, position INTEGER, N INTEGER, cis INTEGER)")
+        self("CREATE TABLE extra (gene TEXT, genename TEXT, genetype TEXT, chromosome INTEGER, \
+                                  start INTEGER, end INTEGER, strand TEXT, \
+                                  [pred.perf.R2] DOUBLE, [pred.perf.pval] DOUBLE, [pred.perf.qval] DOUBLE)")
 
     def __call__(self, sql, args=None):
         c = self.connection.cursor()
