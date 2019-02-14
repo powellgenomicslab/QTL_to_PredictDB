@@ -24,9 +24,6 @@ import Constants
 import pandas
 import re
 
-DEBUG = False
-N_OF_GENES = 200
-
 ########################################################################################################################
 #                                                |--------------------|                                                #
 #------------------------------------------------|    MAIN FUNCTION   |------------------------------------------------#
@@ -117,9 +114,7 @@ def run(args, batch = False, ask_user = False, remove_existent_db=True):
                 gene_name = chunk.iloc[0][Constants.GENENAME] # extract gene name
                 db("INSERT INTO extra VALUES(\"%s\", \"%s\",  NULL, NULL, NULL)" % (gene_name, gene_name))
             Utilities.write_df_into_db(chunk, db)
-            genes_total = i + 1
-            if DEBUG and i == N_OF_GENES:
-                break
+            genes_total += 1
 
     print "DB %s created, with %d/%d genes." % (args.output_file, genes_passed, genes_total)
     print "--- %s seconds ---" % (time.time() - start)

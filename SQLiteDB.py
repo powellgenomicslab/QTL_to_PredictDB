@@ -29,9 +29,11 @@ class DB:
         self("CREATE TABLE weights (rsid TEXT, gene TEXT, weight DOUBLE, varID TEXT, \
                                     ref_allele CHARACTER, eff_allele CHARACTER, pval DOUBLE, \
                                     chromosome INTEGER, position INTEGER, N INTEGER, cis INTEGER)")
-        self("CREATE TABLE extra (gene TEXT, genename TEXT, genetype TEXT, chromosome INTEGER, \
-                                  start INTEGER, end INTEGER, strand TEXT, \
+        self("CREATE TABLE extra (gene TEXT, genename TEXT, \
                                   [pred.perf.R2] DOUBLE, [pred.perf.pval] DOUBLE, [pred.perf.qval] DOUBLE)")
+        #self("CREATE TABLE extra (gene TEXT, genename TEXT, genetype TEXT, chromosome INTEGER, \
+        #                          start INTEGER, end INTEGER, strand TEXT, \
+        #                          [pred.perf.R2] DOUBLE, [pred.perf.pval] DOUBLE, [pred.perf.qval] DOUBLE)")
 
     def __call__(self, sql, args=None):
         c = self.connection.cursor()
@@ -40,7 +42,7 @@ class DB:
 
     def insert_row(self, row):
         self("INSERT INTO weights VALUES(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", NULL, NULL)" % \
-              (row[SNP_idx], row[GENENAME_idx], row[BETA_idx], row[REF_ALLELE_idx], row[ALT_ALLELE_idx], row[PVALUE_idx]))
+              (row[SNP], row[GENENAME], row[BETA], row[REF_ALLELE], row[ALT_ALLELE], row[PVALUE], row[CHROMOSOME], row[POSITION]))
         """alt allele is the dosage/effect allele in GTEx data"""
 
     def insert_row_extra(self, row):

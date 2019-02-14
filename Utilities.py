@@ -114,8 +114,8 @@ def validate_input_parameters(params, info_from_snpid):
 
 
 def write_row_into_db(row, db):
-    db("INSERT INTO weights VALUES(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", NULL, NULL)" % \
-        (row[SNP], row[GENENAME], row[BETA], row[VAR_ID], row[REF_ALLELE], row[ALT_ALLELE], row[PVALUE]))
+    db("INSERT INTO weights VALUES(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", NULL, NULL)" % \
+        (row[SNP], row[GENENAME], row[BETA], row[VAR_ID], row[REF_ALLELE], row[ALT_ALLELE], row[PVALUE], row[CHROMOSOME], row[POSITION]))
 
 
 def write_df_into_db(df, db):

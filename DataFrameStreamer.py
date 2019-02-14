@@ -107,7 +107,6 @@ def build_snp_dictionary(filepath, args, rsid_as_key = False):
 
 def decide_snpid_parser(snpid_format):
 
-    print(snpid_format)
     if snpid_format == "rsid":
         return 1, get_rsid
     elif "(?P<chromosome>.*)" in snpid_format and "(?P<position>.*)" in snpid_format:
@@ -207,7 +206,6 @@ def process_row(comps, pval_thr, indexes, \
 
         key = (chromosome, position)
         if key not in snp_dictionary and ignore_if_not_in_snp_annot:
-            #print "%s is not in dictionary" % (key,)
             return None
         snp_id = snp_dictionary[key]
         var_id = snp_id
@@ -307,7 +305,7 @@ def read_eQTL_file(eqtl_file, params, snpid_regex=None):
 
             # if we're here, this is the last line for the current gene (because the gene just changed),
             # therefore we write the data into a pandas dataframe
-            logging.info("Done with gene {} ({}/{} SNPs passed)".format(sentinel, passed_for_gene, total_for_gene))
+            # logging.info("Done with gene {} ({}/{} SNPs passed)".format(sentinel, passed_for_gene, total_for_gene))
             data = to_dataframe(buf, get_df_colnames(), to_numeric="ignore")
             yield data
 
