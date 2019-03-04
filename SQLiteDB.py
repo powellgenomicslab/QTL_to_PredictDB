@@ -29,8 +29,9 @@ class DB:
         self("CREATE TABLE weights (rsid TEXT, gene TEXT, weight DOUBLE, varID TEXT, \
                                     ref_allele CHARACTER, eff_allele CHARACTER, pval DOUBLE, \
                                     chromosome INTEGER, position INTEGER, N INTEGER, cis INTEGER)")
-        self("CREATE TABLE extra (gene TEXT, genename TEXT, \
+        self("CREATE TABLE extra (gene TEXT, genename TEXT, [n.snps.in.model] INTEGER, \
                                   [pred.perf.R2] DOUBLE, [pred.perf.pval] DOUBLE, [pred.perf.qval] DOUBLE)")
+
         #self("CREATE TABLE extra (gene TEXT, genename TEXT, genetype TEXT, chromosome INTEGER, \
         #                          start INTEGER, end INTEGER, strand TEXT, \
         #                          [pred.perf.R2] DOUBLE, [pred.perf.pval] DOUBLE, [pred.perf.qval] DOUBLE)")
@@ -45,8 +46,8 @@ class DB:
               (row[SNP], row[GENENAME], row[BETA], row[REF_ALLELE], row[ALT_ALLELE], row[PVALUE], row[CHROMOSOME], row[POSITION]))
         """alt allele is the dosage/effect allele in GTEx data"""
 
-    def insert_row_extra(self, row):
-        self("INSERT INTO extra VALUES(\"%s\", \"%s\", NULL, NULL, NULL)" % (row[GENENAME_idx], row[GENENAME_idx]))
+    def insert_row_extra(self, row, n_snps_in_model):
+        self("INSERT INTO extra VALUES(\"%s\", \"%s\", \"%s\", NULL, NULL, NULL)" % (row[GENENAME_idx], row[GENENAME_idx], n_snps_in_model))
 
     def create_indexes(self):
         self("CREATE INDEX weights_rsid ON weights (rsid)")

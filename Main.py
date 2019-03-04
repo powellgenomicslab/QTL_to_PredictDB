@@ -112,7 +112,7 @@ def run(args, batch = False, ask_user = False, remove_existent_db=True):
             if len(chunk.index) != 0:
                 genes_passed += 1
                 gene_name = chunk.iloc[0][Constants.GENENAME] # extract gene name
-                db("INSERT INTO extra VALUES(\"%s\", \"%s\",  NULL, NULL, NULL)" % (gene_name, gene_name))
+                db("INSERT INTO extra VALUES(\"%s\", \"%s\", \"%s\", NULL, NULL, NULL)" % (gene_name, gene_name, len(chunk)))
             Utilities.write_df_into_db(chunk, db)
             genes_total += 1
 
