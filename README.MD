@@ -5,9 +5,8 @@ Example on how to run from Rodrigo's email
 
 Let's say that the eQTL summary statistics files looks like this:
 
-> Beta    SE      Pvalue  gene_id CHROM:POS:NON_EFF:EFF   EAF
-
-> 0.426   0.16    0.00858 ENSG00000006555 1:54965556:G:A  0.148
+> Beta    SE      Pvalue  gene_id CHROM:POS:NON_EFF:EFF   EAF\
+> 0.426   0.16    0.00858 ENSG00000006555 1:54965556:G:A  0.148\
 
 > 0.341   0.148   0.0225  ENSG00000006555 1:54968447:T:A  0.188
 
@@ -24,7 +23,6 @@ In this case, you will need to provide a SNP annotation file that includes chrom
 The command to run the script for this case would be teh following (look at how the regular expression for the SNP ID format is defined):
 
 > python Main.py --input_folder sum_stats \
-
 >               --snp_column CHROM:POS:NON_EFF:EFF \
 >               --snpid_format "(?P<chromosome>.*):(?P<position>.*):(?P<non_effect_allele>.*):(?P<effect_allele>.*)" \
 >               --gene_column gene_id \
