@@ -7,11 +7,8 @@ Let's say that the eQTL summary statistics files looks like this:
 
 > Beta    SE      Pvalue  gene_id CHROM:POS:NON_EFF:EFF   EAF\
 > 0.426   0.16    0.00858 ENSG00000006555 1:54965556:G:A  0.148\
-
-> 0.341   0.148   0.0225  ENSG00000006555 1:54968447:T:A  0.188
-
-> 0.404   0.166   0.016   ENSG00000006555 1:54969716:C:A  0.141
-
+> 0.341   0.148   0.0225  ENSG00000006555 1:54968447:T:A  0.188\
+> 0.404   0.166   0.016   ENSG00000006555 1:54969716:C:A  0.141\
 > 0.373   0.174   0.034   ENSG00000006555 1:54975683:G:A  0.129
 
 and there is a a set of such files (one for each chromosome) in a folder called sum_stats.
