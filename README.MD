@@ -1,7 +1,7 @@
 Code for generating prediction models for molecular traits (gene expression, methylation rate, intron excision, etc.) as SQLite databases, in the format required by both PrediXcan and S-PrediXcan, starting from the corresponding QTL summary statistics.
 
 ------------
-Example on how to run from Rodrigo's email
+## Example on how to run from Rodrigo's email
 
 Let's say that the eQTL summary statistics files looks like this:
 
