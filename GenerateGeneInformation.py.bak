@@ -85,7 +85,7 @@ def generate_dictionary(gencode_file, key):
         d[gene_id] = dd
 
         if i == 1000:
-          print("Processed %s lines" % str(i))
+          print "Processed %s lines" % str(i)
           break
 
   return d

@@ -1,7 +1,7 @@
 __author__ = 'heroico'
 
-from . import logging
-from . import Utilities
+import logging
+import Utilities
 
 class Gene(object):
     def __init__(self, name, base_position, chromosome_name, ens_id):

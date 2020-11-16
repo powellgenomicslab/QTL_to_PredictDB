@@ -30,7 +30,7 @@ def main(input_file, snp_dictionary, snp_column, gene_column, beta_column, pval_
                            pvalue_column = pvalue_column, \
                            output_filepath = output_filename)
 
-  print(command)
+  print command
 
   check_call(command.split()) 
 

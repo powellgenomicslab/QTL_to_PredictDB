@@ -39,7 +39,7 @@ def check_if_dbfile_exists(args, batch, ask_user, remove_existent_db):
                 overwrite = "." # some initial value different from Y/y/N/n
                 while overwrite not in "YyNn":
                     sys.stdout.write("A database called %s already exists. Should I overwrite it? (Y/y/N/n): " % os.path.basename(args.output_file))
-                    overwrite = input()
+                    overwrite = raw_input()
                     sys.stdout.flush()
                 if overwrite.lower() == "y":
                     os.remove(args.output_file) # FIXME: or should I copy it into in a temporal file until the new DB is successfully created?
@@ -48,7 +48,7 @@ def check_if_dbfile_exists(args, batch, ask_user, remove_existent_db):
             else:   # if batch is True, we don't want the user to write input in run time
                 exit("A database called %s already exists. Change output DB's name or remove old DB." % os.path.basename(args.output_file))
         else:
-           print("Removing old %s file" % os.path.basename(args.output_file))
+           print "Removing old %s file" % os.path.basename(args.output_file)
            os.remove(args.output_file)
 
 
@@ -116,8 +116,8 @@ def run(args, batch = False, ask_user = False, remove_existent_db=True):
             Utilities.write_df_into_db(chunk, db)
             genes_total += 1
 
-    print("DB %s created, with %d/%d genes." % (args.output_file, genes_passed, genes_total))
-    print("--- %s seconds ---" % (time.time() - start))
+    print "DB %s created, with %d/%d genes." % (args.output_file, genes_passed, genes_total)
+    print "--- %s seconds ---" % (time.time() - start)
 
     db.create_indexes()
     db.close()

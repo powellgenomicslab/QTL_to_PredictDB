@@ -3,9 +3,9 @@ __author__ = 'heroico'
 import os
 import logging
 import gzip
-from . import ZScoreCalculation
+import ZScoreCalculation
 import GWASUtilities
-from . import Normalization
+import Normalization
 import Exceptions
 
 

@@ -1,6 +1,6 @@
 __author__ = 'heroico'
 
-from . import DataSet
+import DataSet
 
 class DataSetSNP(DataSet.DataSet):
     """" A dat aset form an snp """

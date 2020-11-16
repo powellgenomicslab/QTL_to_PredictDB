@@ -1,8 +1,8 @@
 __author__ = 'heroico'
 
 import gzip
-from . import logging
-from .DataSet import DataSet
+import logging
+from DataSet import DataSet
 
 class KeyedDataSet(DataSet):
     def __init__(self, name=None, index=None, data=[], keys=[]):
@@ -10,7 +10,7 @@ class KeyedDataSet(DataSet):
         self.keys = keys
         self.values_by_key = {}
         if len(keys):
-            self.values_by_key = {keys[i]:data[i] for i in range(0, len(keys))}
+            self.values_by_key = {keys[i]:data[i] for i in xrange(0, len(keys))}
 
 EMPTY = KeyedDataSet()
 
@@ -30,7 +30,7 @@ class KeyedDataSetFileUtilities(object):
     def writeContents(self, file, keyed_data_set, key_header, value_header):
         if key_header and value_header:
             file.write(key_header + " " + value_header + "\n")
-        for i in range(0, len(keyed_data_set.keys)):
+        for i in xrange(0, len(keyed_data_set.keys)):
             key = keyed_data_set.keys[i]
             value = keyed_data_set.data[i]
             file.write(key + " " + str(value) + "\n")
@@ -60,7 +60,7 @@ class KeyedDataSetFileUtilities(object):
 
         keys = sets[0].keys
         reference = set(keys)
-        for i in range(1, sets_count):
+        for i in xrange(1, sets_count):
             assert reference == set(sets[i].keys)
 
         for key in keys:
@@ -123,7 +123,7 @@ class KeyedDataSetFileUtilities(object):
             names = line.split(separator) if separator else line.split()
 
         if len(cols) == 0:
-            for i in range(0, len(names)):
+            for i in xrange(0, len(names)):
                 cols.append(i)
 
         value_sets = []

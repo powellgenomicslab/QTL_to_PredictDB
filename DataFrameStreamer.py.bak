@@ -52,7 +52,7 @@ def get_col_indexes(header_comps, params):
 
 def to_dataframe(data, columns, to_numeric=None, fill_na=None):
 
-    data = list(zip(*data))
+    data = zip(*data)
     if to_numeric:
         data = [pandas.to_numeric(x, errors=to_numeric) for x in data]
     if len(data) == 0:
@@ -139,7 +139,7 @@ def show_progress(progress, current_line, total_lines):
          k = int(100*current_line/total_lines)
          if progress != k:
              progress = k
-             print("{}\% completed ({}/~{})".format(k, current_line, total_lines))
+             print "{}\% completed ({}/~{})".format(k, current_line, total_lines)
          return progress
     else:
         pass

@@ -1,9 +1,9 @@
 __author__ = 'heroico'
 
 import weakref
-from tkinter import *
-from tkinter.ttk import *
-from .Utilities import TS
+from Tkinter import *
+from ttk import *
+from Utilities import TS
 
 RHW = 70
 LHW = 20

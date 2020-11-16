@@ -81,7 +81,7 @@ def prevalidate_format(params, header_comps):
         logging.error("Beta column name is not correct.")
         valid_format = False
     if params.snp_column not in header_comps:
-        print(params.snp_column, header_comps)
+        print params.snp_column, header_comps
         logging.error("SNP column name is not correct.")
         valid_format = False
     if params.gene_column not in header_comps:

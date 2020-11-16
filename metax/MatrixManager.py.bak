@@ -1,6 +1,6 @@
 import pandas
 import numpy
-from . import Exceptions
+import Exceptions
 
 def load_matrix_manager(path):
     d = pandas.read_table(path, sep="\s+")
@@ -54,7 +54,7 @@ def _validate(d):
 def _build_data(d):
     d = d.fillna("NA")
     d.GENE = pandas.Categorical(d.GENE, d.GENE.drop_duplicates())  # speed things up!
-    d = list(zip(d[CDTF.K_GENE].values, d[CDTF.K_RSID1].values, d[CDTF.K_RSID2].values, d[CDTF.K_VALUE].values))
+    d = zip(d[CDTF.K_GENE].values, d[CDTF.K_RSID1].values, d[CDTF.K_RSID2].values, d[CDTF.K_VALUE].values)
     r = {}
     for t in d:
         gene = t[0]
@@ -70,7 +70,7 @@ def _get(d, gene, snps_whitelist=None, strict=True):
     d = d[gene]
 
     if snps_whitelist is not None:
-        g, r1, r2, v = list(zip(*d))
+        g, r1, r2, v = zip(*d)
         snps = set(r1)
         snps_whitelist = set(snps_whitelist)
         if strict:

@@ -113,7 +113,7 @@ class ProcessWeightDB(object):
     def addToCovarianceFile(self, weight_db_logic, name, snps, snps_by_rsid):
         logging.info("Adding to covariance for %s-%s", name, self.weight_db)
 
-        genes = list(weight_db_logic.weights_by_gene.keys())
+        genes = weight_db_logic.weights_by_gene.keys()
         total_genes = len(genes)
         last_reported_percent = 0
         processed = 0
@@ -140,7 +140,7 @@ class ProcessWeightDB(object):
 
     def buildCovarianceEntries(self, name, gene, weight_db_logic, snps_by_rsid):
         weights_in_gene = weight_db_logic.weights_by_gene[gene]
-        rsids_from_genes = list(weights_in_gene.keys())
+        rsids_from_genes = weights_in_gene.keys()
 
         #gather as much data as we can work on
         related_rsids, related_data = self.buildRelatedData(rsids_from_genes, snps_by_rsid, weights_in_gene)
@@ -199,7 +199,7 @@ class ProcessWeightDB(object):
             if weight.ref_allele == related_snp.eff_allele and\
                 weight.eff_allele == related_snp.ref_allele:
                 logging.log(7, "related rsid %s has alleles flipped compared to model, transforming dosage", rsid)
-                data = [2-x for x in data]
+                data = map(lambda x: 2-x, data)
 
             related_data.append(data)
             related_rsids.append(rsid)
@@ -215,13 +215,13 @@ class ProcessWeightDB(object):
             entries.append((r,r,c))
             return entries
 
-        for i in range(0, len(rsids_from_genes)):
+        for i in xrange(0, len(rsids_from_genes)):
             rsid_i = rsids_from_genes[i]
             related_i = -1
             if rsid_i in related_rsids:
                 related_i = related_rsids.index(rsid_i)
 
-            for j in range(0, len(rsids_from_genes)):
+            for j in xrange(0, len(rsids_from_genes)):
                 rsid_j = rsids_from_genes[j]
 
                 related_j = -1
@@ -248,7 +248,7 @@ class ProcessWeightDB(object):
 
     def addToCorrelationFile(self, weight_db_logic, name, snps, snps_by_rsid):
         logging.info("Building correlation database for %s-%s", name, self.weight_db)
-        genes = list(weight_db_logic.weights_by_gene.keys())
+        genes = weight_db_logic.weights_by_gene.keys()
         total_genes = len(genes)
         last_reported_percent = 0
         processed = 0
@@ -269,7 +269,7 @@ class ProcessWeightDB(object):
 
     def buildCorrelationEntries(self, name, gene, weight_db_logic, snps_by_rsid):
         weights_in_gene = weight_db_logic.weights_by_gene[gene]
-        rsids_from_genes = list(weights_in_gene.keys())
+        rsids_from_genes = weights_in_gene.keys()
 
         #gather as much data as we can work on
         related_rsids, related_data = self.buildRelatedData(rsids_from_genes, snps_by_rsid, weights_in_gene)

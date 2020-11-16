@@ -2,9 +2,9 @@ __author__ = 'heroico'
 
 import gzip
 import os
-from . import logging
-from . import DataSetSNP
-from . import Utilities
+import logging
+import DataSetSNP
+import Utilities
 
 class ILTF:
     """IMPUTE legend file format"""
@@ -104,7 +104,7 @@ class IMPUTEDosageLoader(object):
                 position = id_components[1]
                 ref_allele = legend_line[ILTF.A0]
                 eff_allele = legend_line[ILTF.A1]
-                data = list(map(int, dosage_line.strip().split(" ")))
+                data = map(int, dosage_line.strip().split(" "))
 
                 snp = DataSetSNP.DataSetSNP(name=rsid, index=row, data=data, position=int(position), ref_allele=ref_allele, eff_allele=eff_allele)
                 if snp.name in self.snps_by_rsid:
@@ -133,8 +133,8 @@ class IMPUTEFilteredDosageFileBuilder(object):
     def buildIMPUTE(self):
         logging.info("Building IMPUTE dosage file for %s", os.path.join(self.base_path,self.name))
         logging.debug("all people: %d", len(self.all_people))
-        logging.debug("selected people: %d", len(list(self.selected_people_by_id.keys())))
-        logging.debug("snps: %d", len(list(self.snp_dict.keys())))
+        logging.debug("selected people: %d", len(self.selected_people_by_id.keys()))
+        logging.debug("snps: %d", len(self.snp_dict.keys()))
 
         dosage_file_name = Utilities.dosageName(self.output_pattern)
         legend_file_name = Utilities.legendName(self.output_pattern)
@@ -151,7 +151,7 @@ class IMPUTEFilteredDosageFileBuilder(object):
                 self.selected_people_by_id = selected_people_by_id
                 self.found_snps = 0
                 self.last_reported_percenteage = 0
-                self.snps_len = len(list(self.snp_dict.keys()))
+                self.snps_len = len(self.snp_dict.keys())
 
             def __call__(self, hap_line, legend_line):
                 rsid, valid, legend = checkLegend(legend_line, self.snp_dict)
@@ -181,8 +181,8 @@ class IMPUTEFilteredDosageFileBuilder(object):
     def buildPrediXcan(self):
         logging.info("Building PrediXcan dosage file for %s", os.path.join(self.base_path,self.name))
         logging.debug("all people: %d", len(self.all_people))
-        logging.debug("selected people: %d", len(list(self.selected_people_by_id.keys())))
-        logging.debug("snps: %d", len(list(self.snp_dict.keys())))
+        logging.debug("selected people: %d", len(self.selected_people_by_id.keys()))
+        logging.debug("snps: %d", len(self.snp_dict.keys()))
 
         dosage_file_name = Utilities.dosageName(self.output_pattern)
         if os.path.exists(dosage_file_name):
@@ -198,7 +198,7 @@ class IMPUTEFilteredDosageFileBuilder(object):
                 self.selected_people_by_id = selected_people_by_id
                 self.found_snps = 0
                 self.last_reported_percenteage = 0
-                self.snps_len = len(list(self.snp_dict.keys()))
+                self.snps_len = len(self.snp_dict.keys())
 
             def __call__(self, hap_line, legend_line):
                 rsid, valid, legend = checkLegend(legend_line, self.snp_dict)

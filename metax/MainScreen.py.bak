@@ -1,23 +1,23 @@
 __author__ = 'heroico'
 
 import os
-from . import logging
+import logging
 import weakref
-import tkinter.filedialog
-import tkinter.messagebox
-import tkinter
+import tkFileDialog
+import tkMessageBox
+import Tkinter
 from subprocess import call
 from threading import Thread
 import metax.MainScreenView as MainScreenView
 import metax.MetaXcanUITask as MetaXcanUITask
 import metax.Exceptions as Exceptions
-from . import MetaXcan
+import MetaXcan
 import metax.Formats as Formats
 import metax.GWASUtilities as GWASUtilities
 import metax.ZScoreCalculation as ZScoreCalculation
 import metax.Normalization as Normalization
-from .Utilities import TS
-from .Utilities import checkSubdirectorySanity
+from Utilities import TS
+from Utilities import checkSubdirectorySanity
 
 
 GWAS_INPUT_DEFAULT = "data/GWAS"
@@ -54,52 +54,52 @@ class MainScreen(object):
         # self.compressed_on = Tkinter.BooleanVar()
         # self.compressed_on.set(False)
 
-        self.gwas_file_pattern_value = tkinter.StringVar()
+        self.gwas_file_pattern_value = Tkinter.StringVar()
 
-        self.separator_value = tkinter.StringVar()
+        self.separator_value = Tkinter.StringVar()
 
-        self.snp_value = tkinter.StringVar()
+        self.snp_value = Tkinter.StringVar()
         self.snp_value.set("SNP")
 
-        self.non_effect_allele_value = tkinter.StringVar()
+        self.non_effect_allele_value = Tkinter.StringVar()
         self.non_effect_allele_value.set("A2")
 
-        self.effect_allele_value = tkinter.StringVar()
+        self.effect_allele_value = Tkinter.StringVar()
         self.effect_allele_value.set("A1")
 
-        self.or_on = tkinter.BooleanVar()
+        self.or_on = Tkinter.BooleanVar()
         self.or_on.set(False)
-        self.or_value = tkinter.StringVar()
+        self.or_value = Tkinter.StringVar()
         self.or_value.set("OR")
 
-        self.beta_on = tkinter.BooleanVar()
+        self.beta_on = Tkinter.BooleanVar()
         self.beta_on.set(False)
-        self.beta_value = tkinter.StringVar()
+        self.beta_value = Tkinter.StringVar()
         self.beta_value.set("BETA")
 
-        self.beta_sign_on = tkinter.BooleanVar()
+        self.beta_sign_on = Tkinter.BooleanVar()
         self.beta_sign_on.set(False)
-        self.beta_sign_value = tkinter.StringVar()
+        self.beta_sign_value = Tkinter.StringVar()
         self.beta_sign_value.set("BETA_SIGN")
 
-        self.beta_z_on = tkinter.BooleanVar()
+        self.beta_z_on = Tkinter.BooleanVar()
         self.beta_z_on.set(False)
-        self.beta_z_value = tkinter.StringVar()
+        self.beta_z_value = Tkinter.StringVar()
         self.beta_z_value.set("Z")
 
-        self.p_on = tkinter.BooleanVar()
+        self.p_on = Tkinter.BooleanVar()
         self.p_on.set(False)
-        self.p_value = tkinter.StringVar()
+        self.p_value = Tkinter.StringVar()
         self.p_value.set("P")
 
-        self.se_on = tkinter.BooleanVar()
+        self.se_on = Tkinter.BooleanVar()
         self.se_on.set(False)
-        self.se_value = tkinter.StringVar()
+        self.se_value = Tkinter.StringVar()
         self.se_value.set("SE")
 
-        self.frequency_on = tkinter.BooleanVar()
+        self.frequency_on = Tkinter.BooleanVar()
         self.frequency_on.set(True)
-        self.frequency_value = tkinter.StringVar()
+        self.frequency_value = Tkinter.StringVar()
         self.frequency_value.set("")
 
         self.covariance_file = "."
@@ -126,7 +126,7 @@ class MainScreen(object):
 
     def toggleOption(self, boolean_var, entry):
         on = boolean_var.get()
-        entry.config(state=(tkinter.NORMAL if on else tkinter.DISABLED))
+        entry.config(state=(Tkinter.NORMAL if on else Tkinter.DISABLED))
 
     def gwasFolderButtonPressed(self):
         rel = self.folderButtonPressed(self.view.gwas_button, True)
@@ -163,7 +163,7 @@ class MainScreen(object):
             self.interrupt()
 
     def folderButtonPressed(self, button, must_exist):
-        dir = tkinter.filedialog.askdirectory(mustexist=must_exist)
+        dir = tkFileDialog.askdirectory(mustexist=must_exist)
         if len(dir) == 0:
             return None
         rel = os.path.relpath(dir, self.cwd)
@@ -171,7 +171,7 @@ class MainScreen(object):
         return rel
 
     def saveFileButtonPressed(self, button):
-        file = tkinter.filedialog.asksaveasfilename()
+        file = tkFileDialog.asksaveasfilename()
         if len(file) == 0:
             return None
         rel = os.path.relpath(file, self.cwd)
@@ -179,7 +179,7 @@ class MainScreen(object):
         return rel
 
     def openFileButtonPressed(self, button):
-        file = tkinter.filedialog.askopenfilename()
+        file = tkFileDialog.askopenfilename()
         if len(file) == 0:
             return None
         rel = os.path.relpath(file, self.cwd)
@@ -276,7 +276,7 @@ class MainScreen(object):
         self.process = None
 
     def launchTask(self):
-        self.view.text.delete("1.0", tkinter.END)
+        self.view.text.delete("1.0", Tkinter.END)
         self.running = True
         work = self.buildWork()
         process, monitor = MetaXcanUITask.runWork(work, self.taskCallback)
@@ -289,8 +289,8 @@ class MainScreen(object):
         poll.start()
 
     def taskCallback(self, queue):
-        self.view.text.insert(tkinter.END, queue.get())
-        self.view.text.see(tkinter.END)
+        self.view.text.insert(Tkinter.END, queue.get())
+        self.view.text.see(Tkinter.END)
 
     def pollProcess(self):
         code = None
@@ -349,7 +349,7 @@ class MainScreen(object):
             def run(self):
                 try:
                     MetaXcan.run(self.args)
-                except Exceptions.ReportableException as e:
+                except Exceptions.ReportableException, e:
                     logging.error(e.msg)
                 except Exception as e:
                     logging.info("Exception when running task: %s", str(e))
@@ -364,11 +364,11 @@ class MainScreen(object):
                 try:
                     #delete as we go so that stuff gets deleted
                     self.works = list(reversed(self.works))
-                    for i in range(len(self.works) - 1, -1, -1):
+                    for i in xrange(len(self.works) - 1, -1, -1):
                         work = self.works[i]
                         work.run()
                         del self.works[i]
-                except Exceptions.ReportableException as e:
+                except Exceptions.ReportableException, e:
                     logging.error(e.msg)
                 except Exception as e:
                     logging.info("Exception when running task: %s", str(e))
