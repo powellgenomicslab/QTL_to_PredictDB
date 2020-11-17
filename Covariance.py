@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 __author__ = 'heroico'
 
-# borrowed from MetaXcan repository
+# Import metascan as a directory
+# These are adapted for python 3
 
 import logging
 import numpy
 import os
 import gzip
 import ntpath
-import metax.WeightDBUtilities as WeightDBUtilities
-import metax.PrediXcanFormatUtilities as PrediXcanFormatUtilities
-import metax.ThousandGenomesUtilities as ThousandGenomesUtilities
-import metax.Logging as Logging
-import metax.Utilities as Utilities
-import metax.Formats as Formats
-
+from metax.WeightDBUtilities import WeightDBUtilities
+from metax.PrediXcanFormatUtilities import PrediXcanFormatUtilities
+from metax.ThousandGenomesUtilities import ThousandGenomesUtilities
+from metax.Logging import Logging
+from metax.Utilities import Utilities
+from metax.Formats import Formats
 
 def pathLeaf(path):
     head, tail = ntpath.split(path)
