@@ -9,7 +9,14 @@ import numpy
 import os
 import gzip
 import ntpath
-import metax
+
+from metax import WeightDBUtilities
+from metax import PrediXcanFormatUtilities
+from metax import ThousandGenomesUtilities
+from metax import Logging
+from metax import Utilities
+from metax import Formats
+
 
 def pathLeaf(path):
     head, tail = ntpath.split(path)
