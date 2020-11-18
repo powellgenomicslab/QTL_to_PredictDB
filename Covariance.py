@@ -26,7 +26,7 @@ class ProcessWeightDB(object):
     def __init__(self, args):
         self.weight_db = pathLeaf(args.weight_db)
         self.db_path = args.weight_db
-        self.data_folder = args.inÑput_folder
+        self.data_folder = args.input_folder
         self.correlation_output = args.correlation_output
         self.covariance_output = args.covariance_output
         if args.covariance_output is None:
