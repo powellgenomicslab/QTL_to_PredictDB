@@ -95,7 +95,7 @@ class ProcessWeightDB(object):
                 self.addToCovarianceFile(weight_db_logic, name, snps, snps_by_rsid)
 
     def writeFileHeader(self,path):
-        with gzip.open(path, "ab") as file:
+        with gzip.open(path, "wt") as file:
             file.write("GENE RSID1 RSID2 VALUE\n")
 
     def getSNPS(self, name, weight_db_logic):
@@ -135,7 +135,7 @@ class ProcessWeightDB(object):
             self.addToFile(self.covariance_output, gene, entries)
 
     def addToFile(self, path, gene, entries):
-        with gzip.open(path, "ab") as file:
+        with gzip.open(path, "wt") as file:
             for entry in entries:
                 line = " ".join([gene, entry[0], entry[1], entry[2]])+"\n"
                 file.write(line)
