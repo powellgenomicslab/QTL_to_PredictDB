@@ -1,10 +1,10 @@
 __version__ = "0.5.7"
-from metax.WeightDBUtilities import WeightDBUtilities
-from metax.PrediXcanFormatUtilities import PrediXcanFormatUtilities
-from metax.ThousandGenomesUtilities import ThousandGenomesUtilities
-from metax.Logging import Logging
-from metax.Utilities import Utilities
-from metax.Formats import Formats
+import metax.WeightDBUtilities as WeightDBUtilities
+import metax.PrediXcanFormatUtilities as PrediXcanFormatUtilities
+import metax.ThousandGenomesUtilities as ThousandGenomesUtilities
+import metax.Logging as Logging
+import metax.Utilities as Utilities
+import metax.Formats as Formats
 
 def exitIf(doExit, Exception, msg):
     if doExit:
