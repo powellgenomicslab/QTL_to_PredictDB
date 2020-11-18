@@ -82,7 +82,7 @@ def checkSubdirectorySanity(base, candidate):
 
     return sane
 
-from . import logging
+import logging
 class PercentReporter(object):
     def __init__(self, level, total, increment=10, pattern="%i percent complete"):
         self.level = level
