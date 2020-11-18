@@ -1,6 +1,6 @@
 __author__ = 'heroico'
 
-from . import logging
+import logging
 import sys
 
 def configureLogging(level=5, target=sys.stderr):

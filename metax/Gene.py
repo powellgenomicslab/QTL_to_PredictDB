@@ -1,6 +1,6 @@
 __author__ = 'heroico'
 
-from . import logging
+import logging
 from . import Utilities
 
 class Gene(object):

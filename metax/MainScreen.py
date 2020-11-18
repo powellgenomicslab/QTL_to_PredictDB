@@ -1,18 +1,17 @@
 __author__ = 'heroico'
 
 import os
-from . import logging
+import logging
 import weakref
 import tkinter.filedialog
 import tkinter.messagebox
 import tkinter
 from subprocess import call
 from threading import Thread
-import metax.MainScreenView as MainScreenView
-import metax.MetaXcanUITask as MetaXcanUITask
-import metax.Exceptions as Exceptions
+from . import MetaXcanUITask
+from . import Exceptions
 from . import MetaXcan
-import metax.Formats as Formats
+from . import Formats
 import metax.GWASUtilities as GWASUtilities
 import metax.ZScoreCalculation as ZScoreCalculation
 import metax.Normalization as Normalization

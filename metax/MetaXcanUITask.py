@@ -2,7 +2,7 @@ __author__ = 'heroico'
 
 # most of this stolen from http://stackoverflow.com/questions/3842155/is-there-a-way-to-make-the-tkinter-text-widget-read-only
 import time
-from . import logging
+import logging
 from multiprocessing import Process
 from multiprocessing.queues import Queue
 from threading import Thread

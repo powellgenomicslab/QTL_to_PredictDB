@@ -1,6 +1,6 @@
 __author__ = 'heroico'
 
-from . import logging
+import logging
 import os
 import gzip
 from . import Utilities

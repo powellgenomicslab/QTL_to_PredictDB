@@ -2,7 +2,7 @@ __author__ = 'heroico'
 
 import gzip
 import os
-from . import logging
+import logging
 from . import DataSetSNP
 from . import Utilities
 

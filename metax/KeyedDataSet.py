@@ -1,7 +1,7 @@
 __author__ = 'heroico'
 
 import gzip
-from . import logging
+import logging
 from .DataSet import DataSet
 
 class KeyedDataSet(DataSet):
